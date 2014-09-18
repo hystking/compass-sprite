@@ -1,11 +1,8 @@
 @import compass
 @import sprite
 
-+loadSpriteAll("sprite-star", "sprite-star", $scale: 1, $animation: true, $duration: 1s)
-
-.my-star
-  @extend .sprite-star-f0001
++loadSpriteAll("sprite-star", "sprite-star", $animation: true, $duration: 1s)
 
 .my-star-anim
-  @extend .sprite-star
-  @extend .sprite-star-anim
+  @extend %sprite-star
+  @extend %sprite-star-anim

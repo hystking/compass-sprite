@@ -56,7 +56,7 @@ $IMAGE_ROOT: "images/"
   $sprPath: sprite-path($spr)
   $sprWidth: _getImageWidth($sprPath, $scale)
   $sprHeight: _getImageHeight($sprPath, $scale)
-  .#{$sprName}
+  %#{$sprName}
     background-image: $sprImage
     background-image: $sprImage, none
     background-repeat: no-repeat
@@ -66,8 +66,8 @@ $IMAGE_ROOT: "images/"
   
   $names: sprite-names($spr)
   @each $name in $names
-    .#{$sprName}-#{$name}
-      @extend .#{$sprName}
+    %#{$sprName}-#{$name}
+      @extend %#{$sprName}
       +_loadSprite($spr, $name, $scale)
   
   @if $animation != false
@@ -83,20 +83,20 @@ $IMAGE_ROOT: "images/"
       100%
         background-position: $leftLast 0px 
     
-    .#{$sprName}-anim
+    %#{$sprName}-anim
       width: $width
       height: $height
       +animation($animName $duration steps($sprCount, end) 0s infinite)
   
 @mixin _loadSpriteAllDummy($sprPath, $sprName, $scale, $animation, $duration)
-  .#{$sprName}
+  %#{$sprName}
     display: block
     text-indent: -9999px
   
   $names: fileList($IMAGE_ROOT + $sprPath + "/*.png", false, ".png")
   @each $name in $names
-    .#{$sprName}-#{$name}
-      @extend .#{$sprName}
+    %#{$sprName}-#{$name}
+      @extend %#{$sprName}
       +replaceImage($sprPath + "/" + $name + ".png", $scale)
     
   @if $animation != false
@@ -116,7 +116,7 @@ $IMAGE_ROOT: "images/"
       
       100%
         +backgroundImage($sprPath + "/" + nth($names, $sprCount) + ".png", $scale)
-    .#{$sprName}-anim
+    %#{$sprName}-anim
       width: $width
       height: $height
       +animation($animName $duration linear 0s infinite)
