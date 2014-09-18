@@ -1,0 +1,122 @@
+$IMAGE_ROOT: "images/"
+
+@mixin replaceImage($path, $scale: $SCALE)
+  +backgroundImage($path, $scale)
+  $width: _getImageWidth($path, $scale)
+  $height: _getImageHeight($path, $scale)
+  width: $width
+  height: $height
+  background-repeat: no-repeat
+  text-indent: -9999px
+
+@mixin backgroundImage($path, $scale: $SCALE)
+  $width: _getImageWidth($path, $scale)
+  $height: _getImageHeight($path, $scale)
+  +background-size($width, $height)
+  background-image: image-url($path) /* IE8 Fallback */
+  background-image: image-url($path), none /* for Android */
+
+@mixin loadSpriteAll($dir, $reg, $sprName, $scale: 1, $spacing: 4px, $dummy: false, $animation: false, $duration: 1s)
+  @if $dummy == true
+    +_loadSpriteAllDummy($dir, $sprName, $scale, $animation, $duration)
+  @else 
+    $spr: sprite-map("#{$dir}/#{$reg}", $spacing: $spacing, $layout: horizontal)
+    +_loadSpriteAll($spr, $sprName, $scale, $animation, $duration)
+
+@function _getImageWidth($image, $scale)
+  @return ceil(image-width($image) * $scale)
+
+@function _getImageHeight($image, $scale)
+  @return ceil(image-height($image) * $scale)
+
+@mixin _loadSprite($spr, $name, $scale)
+  $sprPath: sprite-path($spr)
+  $image: sprite-file($spr, $name)
+  $width: _getImageWidth($image, $scale)
+  $height: _getImageHeight($image, $scale)
+  $pos: sprite-position($spr, $name)
+  $left: floor(nth($pos, 1) * $scale)
+  $top: floor(nth($pos, 2) * $scale)
+  background-position: $left $top
+  width: $width
+  height: $height
+
+@mixin _loadSpriteTransform($spr, $name, $scale)
+  $sprPath: sprite-path($spr)
+  $image: sprite-file($spr, $name)
+  $width: _getImageWidth($image, $scale)
+  $height: _getImageHeight($image, $scale)
+  $pos: sprite-position($spr, $name)
+  $left: floor(nth($pos, 1) * $scale)
+  $top: floor(nth($pos, 2) * $scale)
+  +translate($left, $top)
+
+@mixin _loadSpriteAll($spr, $sprName, $scale, $animation, $duration)
+  $sprImage: sprite-url($spr)
+  $sprPath: sprite-path($spr)
+  $sprWidth: _getImageWidth($sprPath, $scale)
+  $sprHeight: _getImageHeight($sprPath, $scale)
+  .#{$sprName}
+    background-image: $sprImage
+    background-image: $sprImage, none
+    background-repeat: no-repeat
+    +background-size($sprWidth, $sprHeight)
+    display: block
+    text-indent: -9999px
+  
+  $names: sprite-names($spr)
+  @each $name in $names
+    .#{$sprName}-#{$name}
+      @extend .#{$sprName}
+      +_loadSprite($spr, $name, $scale)
+  
+  @if $animation != false
+    $sprCount: length($names)
+    $imageFirst: sprite-file($spr, nth($names, 1))
+    $width: _getImageWidth($imageFirst, $scale)
+    $height: _getImageHeight($imageFirst, $scale)
+    $animName: #{$sprName}-anim
+    $leftLast: -$sprWidth * $sprCount / $sprCount
+    +keyframes($animName)
+      0%
+        background-position: 0px 0px 
+      100%
+        background-position: $leftLast 0px 
+    
+    .#{$sprName}-anim
+      width: $width
+      height: $height
+      +animation($animName $duration steps($sprCount, end) 0s infinite)
+  
+@mixin _loadSpriteAllDummy($sprPath, $sprName, $scale, $animation, $duration)
+  .#{$sprName}
+    display: block
+    text-indent: -9999px
+  
+  $names: fileList($IMAGE_ROOT + $sprPath + "/*.png", false, ".png")
+  @each $name in $names
+    .#{$sprName}-#{$name}
+      @extend .#{$sprName}
+      +replaceImage($sprPath + "/" + $name + ".png", $scale)
+    
+  @if $animation != false
+    $sprCount: length($names)
+    $imageFirst: $sprPath + "/" + nth($names, 1) + ".png"
+    $width: _getImageWidth($imageFirst, $scale)
+    $height: _getImageHeight($imageFirst, $scale)
+    $animName: #{$sprName}-anim
+    +keyframes($animName)
+      $i: 0
+      @each $name in $names
+        #{$i / $sprCount * 100}#{"%"}
+          +backgroundImage($sprPath + "/" + $name + ".png", $scale)
+        #{($i+1) / $sprCount * 100 - 0.0001}#{"%"}
+          +backgroundImage($sprPath + "/" + $name + ".png", $scale)
+        $i: $i + 1
+      
+      100%
+        +backgroundImage($sprPath + "/" + nth($names, $sprCount) + ".png", $scale)
+    .#{$sprName}.anim
+      width: $width
+      height: $height
+      +animation($animName $duration linear 0s infinite)
