@@ -16,11 +16,11 @@ $IMAGE_ROOT: "images/"
   background-image: image-url($path) /* IE8 Fallback */
   background-image: image-url($path), none /* for Android */
 
-@mixin loadSpriteAll($dir, $reg, $sprName, $scale: 1, $spacing: 4px, $dummy: false, $animation: false, $duration: 1s)
+@mixin loadSpriteAll($dir, $sprName, $scale: 1, $spacing: 4px, $dummy: false, $animation: false, $duration: 1s)
   @if $dummy == true
     +_loadSpriteAllDummy($dir, $sprName, $scale, $animation, $duration)
   @else 
-    $spr: sprite-map("#{$dir}/#{$reg}", $spacing: $spacing, $layout: horizontal)
+    $spr: sprite-map("#{$dir}/*.png", $spacing: $spacing, $layout: horizontal)
     +_loadSpriteAll($spr, $sprName, $scale, $animation, $duration)
 
 @function _getImageWidth($image, $scale)
